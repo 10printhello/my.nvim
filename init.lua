@@ -26,9 +26,7 @@ vim.opt.rtp:prepend(lazypath)
 --
 --  You can also configure plugins after the setup call,
 --    as they will be available in your neovim runtime.
-require('lazy').setup({
-  -- NOTE: First, some plugins that don't require any configuration
-
+local plugins = {
   -- Git related plugins
   'tpope/vim-fugitive',
   'tpope/vim-rhubarb',
@@ -54,7 +52,6 @@ require('lazy').setup({
       'folke/neodev.nvim',
     },
   },
-
   {
     -- Autocompletion
     'hrsh7th/nvim-cmp',
@@ -71,91 +68,102 @@ require('lazy').setup({
       'rafamadriz/friendly-snippets',
     },
   },
+  -- Colorschemes
+  -- {
+  --   "folke/tokyonight.nvim",
+  --   lazy = false, -- make sure we load this during startup if it is your main colorscheme
+  --   priority = 1000, -- make sure to load this before all the other start plugins
+  --   config = function()
+  --     -- load the colorscheme here
+  --     vim.cmd([[colorscheme tokyonight]])
+  --   end,
+  -- },
+  -- {
+  --   "rebelot/kanagawa.nvim",
+  --   lazy = false,
+  --   priority = 1000,
+
+  -- },
+  {
+    "catppuccin/nvim",
+    priority = 1000,
+  },
 
   -- Useful plugin to show you pending keybinds.
   { 'folke/which-key.nvim', opts = {} },
   {
-    -- Adds git related signs to the gutter, as well as utilities for managing changes
-    'lewis6991/gitsigns.nvim',
-    opts = {
-      -- See `:help gitsigns.txt`
-      signs = {
-        add = { text = '+' },
-        change = { text = '~' },
-        delete = { text = '_' },
-        topdelete = { text = '‾' },
-        changedelete = { text = '~' },
-      },
-      on_attach = function(bufnr)
-        local gs = package.loaded.gitsigns
-
-        local function map(mode, l, r, opts)
-          opts = opts or {}
-          opts.buffer = bufnr
-          vim.keymap.set(mode, l, r, opts)
-        end
-
-        -- Navigation
-        map({ 'n', 'v' }, ']c', function()
-          if vim.wo.diff then
-            return ']c'
-          end
-          vim.schedule(function()
-            gs.next_hunk()
-          end)
-          return '<Ignore>'
-        end, { expr = true, desc = 'Jump to next hunk' })
-
-        map({ 'n', 'v' }, '[c', function()
-          if vim.wo.diff then
-            return '[c'
-          end
-          vim.schedule(function()
-            gs.prev_hunk()
-          end)
-          return '<Ignore>'
-        end, { expr = true, desc = 'Jump to previous hunk' })
-
-        -- Actions
-        -- visual mode
-        map('v', '<leader>hs', function()
-          gs.stage_hunk { vim.fn.line '.', vim.fn.line 'v' }
-        end, { desc = 'stage git hunk' })
-        map('v', '<leader>hr', function()
-          gs.reset_hunk { vim.fn.line '.', vim.fn.line 'v' }
-        end, { desc = 'reset git hunk' })
-        -- normal mode
-        map('n', '<leader>hs', gs.stage_hunk, { desc = 'git stage hunk' })
-        map('n', '<leader>hr', gs.reset_hunk, { desc = 'git reset hunk' })
-        map('n', '<leader>hS', gs.stage_buffer, { desc = 'git Stage buffer' })
-        map('n', '<leader>hu', gs.undo_stage_hunk, { desc = 'undo stage hunk' })
-        map('n', '<leader>hR', gs.reset_buffer, { desc = 'git Reset buffer' })
-        map('n', '<leader>hp', gs.preview_hunk, { desc = 'preview git hunk' })
-        map('n', '<leader>hb', function()
-          gs.blame_line { full = false }
-        end, { desc = 'git blame line' })
-        map('n', '<leader>hd', gs.diffthis, { desc = 'git diff against index' })
-        map('n', '<leader>hD', function()
-          gs.diffthis '~'
-        end, { desc = 'git diff against last commit' })
-
-        -- Toggles
-        map('n', '<leader>tb', gs.toggle_current_line_blame, { desc = 'toggle git blame line' })
-        map('n', '<leader>td', gs.toggle_deleted, { desc = 'toggle git show deleted' })
-
-        -- Text object
-        map({ 'o', 'x' }, 'ih', ':<C-U>Gitsigns select_hunk<CR>', { desc = 'select git hunk' })
-      end,
+  -- Adds git related signs to the gutter, as well as utilities for managing changes
+   'lewis6991/gitsigns.nvim',
+  opts = {
+    -- See `:help gitsigns.txt`
+    signs = {
+      add = { text = '+' },
+      change = { text = '~' },
+      delete = { text = '_' },
+      topdelete = { text = '‾' },
+      changedelete = { text = '~' },
     },
-  },
+    on_attach = function(bufnr)
+      local gs = package.loaded.gitsigns
 
-  {
-    -- Theme inspired by Atom
-    'navarasu/onedark.nvim',
-    priority = 1000,
-    config = function()
-      vim.cmd.colorscheme 'onedark'
+      local function map(mode, l, r, opts)
+        opts = opts or {}
+        opts.buffer = bufnr
+        vim.keymap.set(mode, l, r, opts)
+      end
+
+      -- Navigation
+      map({ 'n', 'v' }, ']c', function()
+        if vim.wo.diff then
+          return ']c'
+        end
+        vim.schedule(function()
+          gs.next_hunk()
+        end)
+        return '<Ignore>'
+      end, { expr = true, desc = 'Jump to next hunk' })
+
+      map({ 'n', 'v' }, '[c', function()
+        if vim.wo.diff then
+          return '[c'
+        end
+        vim.schedule(function()
+          gs.prev_hunk()
+        end)
+        return '<Ignore>'
+      end, { expr = true, desc = 'Jump to previous hunk' })
+
+      -- Actions
+      -- visual mode
+      map('v', '<leader>hs', function()
+        gs.stage_hunk { vim.fn.line '.', vim.fn.line 'v' }
+      end, { desc = 'stage git hunk' })
+      map('v', '<leader>hr', function()
+        gs.reset_hunk { vim.fn.line '.', vim.fn.line 'v' }
+      end, { desc = 'reset git hunk' })
+      -- normal mode
+      map('n', '<leader>hs', gs.stage_hunk, { desc = 'git stage hunk' })
+      map('n', '<leader>hr', gs.reset_hunk, { desc = 'git reset hunk' })
+      map('n', '<leader>hS', gs.stage_buffer, { desc = 'git Stage buffer' })
+      map('n', '<leader>hu', gs.undo_stage_hunk, { desc = 'undo stage hunk' })
+      map('n', '<leader>hR', gs.reset_buffer, { desc = 'git Reset buffer' })
+      map('n', '<leader>hp', gs.preview_hunk, { desc = 'preview git hunk' })
+      map('n', '<leader>hb', function()
+        gs.blame_line { full = false }
+      end, { desc = 'git blame line' })
+      map('n', '<leader>hd', gs.diffthis, { desc = 'git diff against index' })
+      map('n', '<leader>hD', function()
+        gs.diffthis '~'
+      end, { desc = 'git diff against last commit' })
+
+      -- Toggles
+      map('n', '<leader>tb', gs.toggle_current_line_blame, { desc = 'toggle git blame line' })
+      map('n', '<leader>td', gs.toggle_deleted, { desc = 'toggle git show deleted' })
+
+      -- Text object
+      map({ 'o', 'x' }, 'ih', ':<C-U>Gitsigns select_hunk<CR>', { desc = 'select git hunk' })
     end,
+  },
   },
 
   {
@@ -227,7 +235,12 @@ require('lazy').setup({
   --
   --    For additional information see: https://github.com/folke/lazy.nvim#-structuring-your-plugins
   { import = 'custom.plugins' },
-}, {})
+
+}
+
+local opts = {}
+require('lazy').setup(plugins, opts)
+  
 
 -- [[ Setting options ]]
 -- See `:help vim.o`
@@ -309,6 +322,7 @@ require('telescope').setup {
     },
   },
 }
+
 
 -- Enable telescope fzf native, if installed
 pcall(require('telescope').load_extension, 'fzf')
@@ -525,7 +539,7 @@ require('mason-lspconfig').setup()
 local servers = {
   -- clangd = {},
   -- gopls = {},
-  -- pyright = {},
+  pyright = {},
   -- rust_analyzer = {},
   -- tsserver = {},
   -- html = { filetypes = { 'html', 'twig', 'hbs'} },
@@ -617,7 +631,81 @@ cmp.setup {
   },
 }
 
-
-
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
+-- require("catppuccin").setup()
+-- vim.cmd.colorscheme "catppuccin"
+
+vim.wo.relativenumber = true
+
+
+require("catppuccin").setup({
+  flavour = "mocha", -- latte, frappe, macchiato, mocha
+  background = { -- :h background
+      light = "latte",
+      dark = "mocha",
+  },
+  transparent_background = false, -- disables setting the background color.
+  show_end_of_buffer = false, -- shows the '~' characters after the end of buffers
+  term_colors = false, -- sets terminal colors (e.g. `g:terminal_color_0`)
+  dim_inactive = {
+      enabled = false, -- dims the background color of inactive window
+      shade = "dark",
+      percentage = 0.15, -- percentage of the shade to apply to the inactive window
+  },
+  no_italic = false, -- Force no italic
+  no_bold = false, -- Force no bold
+  no_underline = false, -- Force no underline
+  styles = { -- Handles the styles of general hi groups (see `:h highlight-args`):
+      comments = { "italic" }, -- Change the style of comments
+      conditionals = { "italic" },
+      loops = {},
+      functions = {},
+      keywords = {},
+      strings = {},
+      variables = {},
+      numbers = {},
+      booleans = {},
+      properties = {},
+      types = {},
+      operators = {},
+      -- miscs = {}, -- Uncomment to turn off hard-coded styles
+  },
+  color_overrides = {},
+  custom_highlights = {},
+  default_integrations = true,
+  integrations = {
+      cmp = true,
+      gitsigns = true,
+      nvimtree = true,
+      treesitter = true,
+      notify = false,
+      mini = {
+          enabled = true,
+          indentscope_color = "",
+      },
+      -- For more plugins integrations please scroll down (https://github.com/catppuccin/nvim#integrations)
+  },
+--   color_overrides = {
+--     mocha = {
+--       base= "#1F1F1F",
+--       -- blue= "#DCDCAA",
+--       -- green= "#CE9178",
+--       -- flamingo= "#9CDCFE",
+--       -- lavender= "#9CDCFE",
+--       -- pink= "#9CDCFE",
+--       -- red= "#9CDCFE",
+--       -- maroon= "#9CDCFE",
+--       -- mauve= "#C586C0",
+--       -- text= "#9CDCFE",
+--       -- sky= "#7ee6fd",
+--       -- yellow= "#4ec9B0",
+--       -- rosewater= "#f4c2c2",
+--       -- peach= "#569CD6",
+--       -- teal= "#CE9178"
+--       }
+-- }
+})
+
+-- setup must be called before loading
+vim.cmd.colorscheme "catppuccin"
