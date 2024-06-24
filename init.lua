@@ -32,7 +32,7 @@ local plugins = {
   'tpope/vim-rhubarb',
 
   -- Detect tabstop and shiftwidth automatically
-  'tpope/vim-sleuth',
+  -- 'tpope/vim-sleuth',
 
   -- NOTE: This is where your plugins related to LSP can be installed.
   --  The configuration is done below. Search for lspconfig to find it below.
@@ -397,7 +397,7 @@ vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = 
 vim.defer_fn(function()
   require('nvim-treesitter.configs').setup {
     -- Add languages to be installed here that you want installed for treesitter
-    ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim', 'bash' },
+    ensure_installed = { 'c', 'cpp', 'html','go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim', 'bash' },
 
     -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
     auto_install = false,
@@ -538,11 +538,11 @@ require('mason-lspconfig').setup()
 --  define the property 'filetypes' to the map in question.
 local servers = {
   -- clangd = {},
-  -- gopls = {},
+  gopls = {},
   pyright = {},
   -- rust_analyzer = {},
   -- tsserver = {},
-  -- html = { filetypes = { 'html', 'twig', 'hbs'} },
+  html = { filetypes = { 'html', 'twig', 'hbs'} },
 
   lua_ls = {
     Lua = {
@@ -637,7 +637,7 @@ cmp.setup {
 -- vim.cmd.colorscheme "catppuccin"
 
 vim.wo.relativenumber = true
-
+vim.wo.number = true
 
 require("catppuccin").setup({
   flavour = "mocha", -- latte, frappe, macchiato, mocha
@@ -709,3 +709,20 @@ require("catppuccin").setup({
 
 -- setup must be called before loading
 vim.cmd.colorscheme "catppuccin"
+
+-- Formatting
+vim.o.tabstop = 4
+vim.o.shiftwidth = 4
+vim.o.expandtab = true
+vim.o.smartindent = true
+vim.o.autoindent = true
+vim.o.smarttab = true
+vim.o.expandtab = true
+
+vim.cmd([[
+  autocmd BufRead,BufNewFile *.gohtml set filetype=html
+]])
+
+-- comment mapping
+vim.api.nvim_set_keymap('n', '<leader>/', 'gcc', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('v', '<leader>/', 'gc', { noremap = true, silent = true })
