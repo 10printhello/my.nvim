@@ -30,14 +30,44 @@ local plugins = {
   -- Git related plugins
   'tpope/vim-fugitive',
   'tpope/vim-rhubarb',
-
+  'vim-airline/vim-airline',
   -- Detect tabstop and shiftwidth automatically
+<<<<<<< HEAD
   -- 'tpope/vim-sleuth',
+=======
+  'tpope/vim-sleuth',
+ 
+  -- Themes
+  {
+    "slugbyte/lackluster.nvim",
+    lazy = false,
+    priority = 1000,
+  },
+  {
+    "EdenEast/nightfox.nvim",
+  },
+  {
+    "folke/tokyonight.nvim",
+  },
+  {
+    "sainnhe/sonokai",
+  },
+  {
+    "sainnhe/everforest",
+  },
+  {
+    "sainnhe/gruvbox-material",
+  },
+  {
+    "rebelot/kanagawa.nvim",
+  },
+  -- End of themes
+>>>>>>> 197eb27 (key bindings for terminal etc)
 
-  -- NOTE: This is where your plugins related to LSP can be installed.
+ -- NOTE: This is where your plugins related to LSP can be installed.
   --  The configuration is done below. Search for lspconfig to find it below.
   {
-    -- LSP Configuration & Plugins
+    -- LSP Configuration & Pluginsß
     'neovim/nvim-lspconfig',
     dependencies = {
       -- Automatically install LSPs to stdpath for neovim
@@ -68,22 +98,7 @@ local plugins = {
       'rafamadriz/friendly-snippets',
     },
   },
-  -- Colorschemes
-  -- {
-  --   "folke/tokyonight.nvim",
-  --   lazy = false, -- make sure we load this during startup if it is your main colorscheme
-  --   priority = 1000, -- make sure to load this before all the other start plugins
-  --   config = function()
-  --     -- load the colorscheme here
-  --     vim.cmd([[colorscheme tokyonight]])
-  --   end,
-  -- },
-  -- {
-  --   "rebelot/kanagawa.nvim",
-  --   lazy = false,
-  --   priority = 1000,
 
-  -- },
   {
     "catppuccin/nvim",
     priority = 1000,
@@ -111,7 +126,6 @@ local plugins = {
         opts.buffer = bufnr
         vim.keymap.set(mode, l, r, opts)
       end
-
       -- Navigation
       map({ 'n', 'v' }, ']c', function()
         if vim.wo.diff then
@@ -166,6 +180,32 @@ local plugins = {
   },
   },
 
+{
+  "nvim-neo-tree/neo-tree.nvim",
+  dependencies = {
+    "nvim-lua/plenary.nvim",
+    "nvim-tree/nvim-web-devicons",
+    "MunifTanjim/nui.nvim",
+  },
+  config = function ()
+    require("neo-tree").setup({
+      sources = {
+        "filesystem",
+        "buffers",
+        "git_status",  -- Enable Git status integration
+      },
+      git_status = {
+        window = {
+          position = "right",  -- Show Git status in the left pane
+          width = 30,
+        },
+      },
+    })
+  end,
+},
+
+
+
   {
     -- Set lualine as statusline
     'nvim-lualine/lualine.nvim',
@@ -173,9 +213,12 @@ local plugins = {
     opts = {
       options = {
         icons_enabled = false,
-        theme = 'onedark',
+        theme = 'auto',
         component_separators = '|',
         section_separators = '',
+      },
+      sections = {
+        lualine_c = { { 'filename', path = 1 } },
       },
     },
   },
@@ -198,6 +241,7 @@ local plugins = {
     branch = '0.1.x',
     dependencies = {
       'nvim-lua/plenary.nvim',
+      'nvim-telescope/telescope-github.nvim',
       -- Fuzzy Finder Algorithm which requires local dependencies to be built.
       -- Only load if `make` is available. Make sure you have the system
       -- requirements installed.
@@ -263,7 +307,7 @@ vim.o.clipboard = 'unnamedplus'
 -- Enable break indent
 vim.o.breakindent = true
 
--- Save undo history
+-- Save undo history<cmd
 vim.o.undofile = true
 
 -- Case-insensitive searching UNLESS \C or capital in search
@@ -283,8 +327,13 @@ vim.o.completeopt = 'menuone,noselect'
 -- NOTE: You should make sure your terminal supports this
 vim.o.termguicolors = true
 
--- [[ Basic Keymaps ]]
+-- status line
+vim.o.statusline = '%F %y %m %r %= %p%% %l:%c'
 
+-- [[ Basic Keymaps ]]
+-- Keymap for opening a terminal on the right 
+vim.api.nvim_set_keymap('n', '<leader>t', [[<Cmd>vsplit | wincmd L | terminal<CR>]], { noremap = true, silent = true })
+--
 -- Keymaps for better default experience
 -- See `:help vim.keymap.set()`
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
@@ -505,24 +554,6 @@ local on_attach = function(_, bufnr)
   end, { desc = 'Format current buffer with LSP' })
 end
 
--- document existing key chains
-require('which-key').register {
-  ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
-  ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
-  ['<leader>g'] = { name = '[G]it', _ = 'which_key_ignore' },
-  ['<leader>h'] = { name = 'Git [H]unk', _ = 'which_key_ignore' },
-  ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
-  ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
-  ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
-  ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
-}
--- register which-key VISUAL mode
--- required for visual <leader>hs (hunk stage) to work
-require('which-key').register({
-  ['<leader>'] = { name = 'VISUAL <leader>' },
-  ['<leader>h'] = { 'Git [H]unk' },
-}, { mode = 'v' })
-
 -- mason-lspconfig requires that these setup functions are called in this order
 -- before setting up the servers.
 require('mason').setup()
@@ -637,7 +668,11 @@ cmp.setup {
 -- vim.cmd.colorscheme "catppuccin"
 
 vim.wo.relativenumber = true
+<<<<<<< HEAD
 vim.wo.number = true
+=======
+require('lazy').setup(plugins)
+>>>>>>> 197eb27 (key bindings for terminal etc)
 
 require("catppuccin").setup({
   flavour = "mocha", -- latte, frappe, macchiato, mocha
@@ -671,7 +706,11 @@ require("catppuccin").setup({
       operators = {},
       -- miscs = {}, -- Uncomment to turn off hard-coded styles
   },
-  color_overrides = {},
+  color_overrides = {
+      mocha = {
+        base = "#000000",
+    },
+  },
   custom_highlights = {},
   default_integrations = true,
   integrations = {
@@ -690,7 +729,7 @@ require("catppuccin").setup({
 --     mocha = {
 --       base= "#1F1F1F",
 --       -- blue= "#DCDCAA",
---       -- green= "#CE9178",
+--       -- green= "#CE9178","
 --       -- flamingo= "#9CDCFE",
 --       -- lavender= "#9CDCFE",
 --       -- pink= "#9CDCFE",
@@ -706,7 +745,27 @@ require("catppuccin").setup({
 --       }
 -- }
 })
+-- setup must be called before loadstring 
+vim.cmd.colorscheme "gruvbox-material"
 
+-- Formatting
+vim.o.tabstop = 4
+vim.o.shiftwidth = 4
+vim.o.expandtab = true
+vim.o.smartindent = true
+vim.o.autoindent = true
+vim.o.smarttab = true
+vim.o.expandtab = true
+
+vim.cmd([[
+  autocmd BufRead,BufNewFile *.gohtml set filetype=html
+]])
+
+-- comment mapping
+vim.api.nvim_set_keymap('n', '<leader>/', 'gcc', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('v', '<leader>/', 'gc', { noremap = true, silent = true })
+
+<<<<<<< HEAD
 -- setup must be called before loading
 vim.cmd.colorscheme "catppuccin"
 
@@ -726,3 +785,5 @@ vim.cmd([[
 -- comment mapping
 vim.api.nvim_set_keymap('n', '<leader>/', 'gcc', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('v', '<leader>/', 'gc', { noremap = true, silent = true })
+=======
+>>>>>>> 197eb27 (key bindings for terminal etc)
